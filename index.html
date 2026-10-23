@@ -22,6 +22,9 @@
   .covercap { text-align:center; font-size:1rem; font-style:italic; color:#b8b2a4; margin-bottom:.8rem; }
   .sharewrap { text-align:center; margin-bottom:1.8rem; }
   .sharebtn { font-family:inherit; font-size:1.05rem; color:#d9b45b; background:#18202a; border:1px solid #d9b45b; border-radius:2rem; padding:.5rem 1.6rem; cursor:pointer; }
+  .addrwrap { text-align:center; margin-bottom:1.8rem; font-size:1.1rem; }
+  .addrlink { color:#9fc7e8; font-weight:bold; letter-spacing:.03em; }
+  .copybtn { font-family:inherit; font-size:.95rem; color:#e8e4da; background:none; border:1px solid #2c3644; border-radius:2rem; padding:.3rem 1rem; margin-left:.6rem; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -35,6 +38,7 @@
   </div>
   <div class="covercap">The layered one. Music stacked on music, closer to the original.</div>
   <div class="sharewrap"><button class="sharebtn" data-share="https://mocgoogle.com" data-title="Brainiac at mocgoogle.com — True Freedom">Share this</button></div>
+  <div class="addrwrap"><a class="addrlink" href="https://mocgoogle.com">mocgoogle.com</a><button class="copybtn" data-copy="https://mocgoogle.com">Copy the address</button></div>
 
   <div class="indexhead">INDEX</div>
 
@@ -49,6 +53,7 @@
 </div>
 <script>
 document.querySelectorAll('[data-share]').forEach(function(b){b.addEventListener('click',function(){var u=b.getAttribute('data-share');var t=b.getAttribute('data-title')||'Brainiac at mocgoogle.com';if(navigator.share){navigator.share({title:t,text:t,url:u}).catch(function(){});}else if(navigator.clipboard){navigator.clipboard.writeText(u).then(function(){var o=b.textContent;b.textContent='Link copied, pass it on';setTimeout(function(){b.textContent=o;},2200);});}});});
+document.querySelectorAll('[data-copy]').forEach(function(b){b.addEventListener('click',function(){var u=b.getAttribute('data-copy');if(navigator.clipboard){navigator.clipboard.writeText(u).then(function(){var o=b.textContent;b.textContent='Copied, pass it on';setTimeout(function(){b.textContent=o;},2200);});}});});
 </script>
 </body>
 </html>
