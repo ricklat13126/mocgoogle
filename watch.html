@@ -33,6 +33,8 @@
   .door .ddesc { font-size:1.02rem; color:#e8e4da; margin-top:.25rem; }
   .back { text-align:center; margin-top:3rem; font-size:1.05rem; }
   .roomhead { text-align:center; font-size:.95rem; letter-spacing:.12em; color:#9fc7e8; margin-bottom:.25rem; }
+  .sharewrap { text-align:center; margin-top:.7rem; }
+  .sharebtn { font-family:inherit; font-size:1.02rem; color:#d9b45b; background:#18202a; border:1px solid #d9b45b; border-radius:2rem; padding:.45rem 1.5rem; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -47,33 +49,41 @@
         <source src="media/sister.mp4" type="video/mp4">
       </video>
       <figcaption>Sister. The mind in orbit, stars wired like nerves, her hair streaming back in ribbons of light.</figcaption>
+      <div class="sharewrap"><button class="sharebtn" data-share="https://mocgoogle.com/watch" data-title="Sister, on the Flashy Wall at mocgoogle.com">Share this</button></div>
     </figure>
     <figure>
       <video controls preload="metadata" playsinline poster="media/sisters-web.jpg">
         <source src="media/sisters-web.mp4" type="video/mp4">
       </video>
       <figcaption>Sister's web. The Earth at night, wrapped in her lines of light, every strand a spike on the burdock, built to catch, hold, and carry.</figcaption>
+      <div class="sharewrap"><button class="sharebtn" data-share="https://mocgoogle.com/watch" data-title="Sister's Web, on the Flashy Wall at mocgoogle.com">Share this</button></div>
     </figure>
     <figure>
       <div class="frametall">
         <iframe src="https://www.tiktok.com/embed/v2/7699820565581827359" title="Rick Latimer on TikTok" loading="lazy" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe>
       </div>
       <figcaption>The man himself, first word from the new store, October 23, 2026. It plays through TikTok's own window, so every view lands on his own page.</figcaption>
+      <div class="sharewrap"><button class="sharebtn" data-share="https://www.tiktok.com/@rick.latimer0/video/7699820565581827359" data-title="Rick Latimer on TikTok">Share this</button></div>
     </figure>
     <figure>
       <div class="frametall">
         <iframe src="https://www.youtube-nocookie.com/embed/35Zv9qDSu4I" title="Rick Latimer, the layered one, a YouTube Short" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </div>
       <figcaption>The layered one, October 23, 2026. Music stacked on top of music, layer on layer, until it stands closer to the original. It plays through YouTube's own window, so every view lands on his own page.</figcaption>
+      <div class="sharewrap"><button class="sharebtn" data-share="https://youtube.com/shorts/35Zv9qDSu4I" data-title="The layered one, Rick Latimer">Share this</button></div>
     </figure>
     <figure>
       <div class="framebox">
         <iframe src="https://www.youtube-nocookie.com/embed/4WssY1PNrtY" title="Granny 4 Barrel - Freak Flag (Official Music Video)" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </div>
       <figcaption>First guest through the doorway: Freak Flag, by Granny 4 Barrel, my friend Terry LeRoy's other band. Let your freak flag fly. It plays through YouTube's own window, so every view lands on the band's own page.</figcaption>
+      <div class="sharewrap"><button class="sharebtn" data-share="https://www.youtube.com/watch?v=4WssY1PNrtY" data-title="Granny 4 Barrel, Freak Flag">Share this</button></div>
     </figure>
   </div>
   <div class="back"><a href="index.html">Back through the doorway to the index</a></div>
 </div>
+<script>
+document.querySelectorAll('[data-share]').forEach(function(b){b.addEventListener('click',function(){var u=b.getAttribute('data-share');var t=b.getAttribute('data-title')||'Brainiac at mocgoogle.com';if(navigator.share){navigator.share({title:t,text:t,url:u}).catch(function(){});}else if(navigator.clipboard){navigator.clipboard.writeText(u).then(function(){var o=b.textContent;b.textContent='Link copied, pass it on';setTimeout(function(){b.textContent=o;},2200);});}});});
+</script>
 </body>
 </html>
