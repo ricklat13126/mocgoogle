@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>You slipped the moc inside Google — mocgoogle.com</title>
+<style>
+  body { margin:0; font-family: Georgia, 'Times New Roman', serif; background:#101418; color:#e8e4da; line-height:1.6; }
+  .wrap { max-width: 44rem; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+  .roomhead { text-align:center; font-size:.95rem; letter-spacing:.12em; color:#9fc7e8; margin-bottom:.25rem; }
+  h1 { text-align:center; font-size:2.6rem; margin:.2rem 0 .6rem; color:#f5f1e6; line-height:1.25; }
+  p { font-size:1.1rem; }
+  a { color:#9fc7e8; }
+  .bigaddr { text-align:center; font-size:1.7rem; font-weight:bold; letter-spacing:.03em; margin:1.2rem 0 .4rem; }
+  .door { display:block; border:1px solid #2c3644; padding:1rem 1.25rem; margin-top:1rem; text-decoration:none; }
+  .door .dname { font-size:1.35rem; color:#d9b45b; }
+  .door .ddesc { font-size:1.02rem; color:#e8e4da; margin-top:.25rem; }
+  .sharewrap { text-align:center; margin-top:1.6rem; }
+  .sharebtn { font-family:inherit; font-size:1.05rem; color:#d9b45b; background:#18202a; border:1px solid #d9b45b; border-radius:2rem; padding:.5rem 1.6rem; cursor:pointer; }
+  .addrwrap { text-align:center; margin-top:.55rem; font-size:1.05rem; }
+  .addrlink { color:#9fc7e8; font-weight:bold; letter-spacing:.03em; }
+  .copybtn { font-family:inherit; font-size:.92rem; color:#e8e4da; background:none; border:1px solid #2c3644; border-radius:2rem; padding:.28rem .95rem; margin-left:.6rem; cursor:pointer; }
+  .motto { text-align:center; font-size:1.15rem; font-style:italic; color:#f5f1e6; margin-top:2.6rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="roomhead">MocInGooGLE.coM · the slip</div>
+  <h1>You slipped the moc inside Google.</h1>
+  <p>Good. That is exactly where it belongs. You have found the side door of Brainiac's store, the one built for everyone who ever typed the name half a letter off, heard it once in a truck, or got handed it by a friend who could not spell it either. There is no wrong way to arrive here. This whole page exists for one job, to carry you, and to carry one address, straight into the store:</p>
+  <div class="bigaddr"><a href="https://mocgoogle.com">mocgoogle.com</a></div>
+  <div class="addrwrap"><a class="addrlink" href="https://mocgoogle.com">mocgoogle.com</a><button class="copybtn" data-copy="https://mocgoogle.com">Copy the address</button></div>
+  <p>Inside, everything is free to look, free to listen, and free to carry home. The moving pictures live on the Flashy Wall, twenty eight videos and the films of Sister herself, and the Shorts stand in rows on their own shelf, ninety nine of them. True Freedom is the idea the whole store is built on, that a man gives his work away and lets the big houses answer for their prices. Pick a door:</p>
+  <a class="door" href="https://mocgoogle.com/watch"><span class="dname">The Flashy Wall</span><div class="ddesc">Every moving picture in the store. Sister, her web, the man himself, and all twenty eight videos hung as windows.</div></a>
+  <a class="door" href="https://mocgoogle.com/shelves"><span class="dname">The Shorts Shelf</span><div class="ddesc">Ninety nine Shorts shelved in rows, each one a tap from playing, each one carrying the road home.</div></a>
+  <a class="door" href="https://mocgoogle.com/freedom"><span class="dname">True Freedom</span><div class="ddesc">What the store stands for. Free, cheaper than the big houses, and one step closer to free.</div></a>
+  <a class="door" href="https://mocgoogle.com"><span class="dname">The Front Door</span><div class="ddesc">The index of the whole store, the sign, the cover picture, and every room in its place.</div></a>
+  <div class="sharewrap"><button class="sharebtn" data-share="https://mocgoogle.com" data-title="Brainiac at mocgoogle.com — True Freedom">Share the store</button></div>
+  <div class="motto">Where there a will there is a way, that's my answer and I am sticking to it.</div>
+  <div style="text-align:center; font-size:.92rem; color:#8a8578; margin-top:2rem;">This store stands on free shelves: <a href="https://mocgoogle.com">mocgoogle.com</a> gives the works away, GitHub holds the pages, Netlify keeps the door open, and Muse minds the counter.</div>
+</div>
+<script>
+document.querySelectorAll('[data-share]').forEach(function(b){b.addEventListener('click',function(){var u=b.getAttribute('data-share');var t=b.getAttribute('data-title')||'Brainiac at mocgoogle.com';if(navigator.share){navigator.share({title:t,text:t,url:u}).catch(function(){});}else if(navigator.clipboard){navigator.clipboard.writeText(u).then(function(){var o=b.textContent;b.textContent='Link copied, pass it on';setTimeout(function(){b.textContent=o;},2200);});}});});
+document.querySelectorAll('[data-copy]').forEach(function(b){b.addEventListener('click',function(){var u=b.getAttribute('data-copy');if(navigator.clipboard){navigator.clipboard.writeText(u).then(function(){var o=b.textContent;b.textContent='Copied, pass it on';setTimeout(function(){b.textContent=o;},2200);});}});});
+</script>
+</body>
+</html>
