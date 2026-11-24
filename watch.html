@@ -50,6 +50,227 @@
         async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
+<style>:root {
+      --box-size: clamp(290px, 80vw, 430px);
+      --half-size: calc(var(--box-size) / 2);
+    }
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    /* 3D Stage */
+    .scene {
+      width: var(--box-size);
+      height: var(--box-size);
+      perspective: 1100px;
+      margin: auto;
+    }
+
+    .cube {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .face {
+      position: absolute;
+      width: var(--box-size);
+      height: var(--box-size);
+      background: rgba(13, 18, 36, 0.96);
+      border: 2px solid #38bdf8;
+      border-radius: 18px;
+      box-shadow: inset 0 0 25px rgba(56, 189, 248, 0.2), 0 0 20px rgba(56, 189, 248, 0.15);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backface-visibility: hidden;
+    }
+
+    .face-tag {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #38bdf8;
+      font-weight: bold;
+    }
+
+    .face h2 {
+      font-size: 1.45rem;
+      color: #ffffff;
+      margin: 8px 0;
+    }
+
+    .face p {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+
+    .action-btn {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 16px;
+      background: #38bdf8;
+      color: #070913;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 10px;
+      text-align: center;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    /* 6 Cube Sides */
+    .front  { transform: rotateY(0deg) translateZ(var(--half-size)); border-color: #38bdf8; }
+    .right  { transform: rotateY(90deg) translateZ(var(--half-size)); border-color: #4ade80; }
+    .back   { transform: rotateY(180deg) translateZ(var(--half-size)); border-color: #c084fc; }
+    .left   { transform: rotateY(-90deg) translateZ(var(--half-size)); border-color: #f472b6; }
+    .top    { transform: rotateX(90deg) translateZ(var(--half-size)); border-color: #facc15; }
+    .bottom { transform: rotateX(-90deg) translateZ(var(--half-size)); border-color: #fb923c; }
+
+    .right .face-tag  { color: #4ade80; }
+    .back .face-tag   { color: #c084fc; }
+    .left .face-tag   { color: #f472b6; }
+    .top .face-tag    { color: #facc15; }
+    .bottom .face-tag { color: #fb923c; }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      z-index: 10;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    .turn-pad {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .turn-btn {
+      background: rgba(30, 41, 59, 0.9);
+      color: #f8fafc;
+      border: 1px solid #475569;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .turn-btn:active {
+      background: #38bdf8;
+      color: #070913;
+    }
+
+    .wheel-credit {
+      font-size: 0.78rem;
+      color: #64748b;
+      text-align: center;
+    }
+.cube-section { background:#070913; padding:2rem 1rem 1.5rem; margin:0; }
+.cube-section .cube-title { text-align:center; color:#38bdf8; font-size:1.6rem; margin:0 0 .5rem; }
+.cube-section .cube-note { text-align:center; color:#94a3b8; font-size:1rem; margin:0 0 1rem; }
+.cube-section .cube-back { text-align:center; margin-top:12px; }
+</style>
+<section class="cube-section">
+<h2 class="cube-title">The Flashy Wall Cube</h2>
+<p class="cube-note">Six videos from the Flashy Wall. Turn the cube and tap a face to watch it.</p>
+<div class="scene" id="scene"><div class="cube" id="cube">
+<div class="face front"><div><span class="face-tag">Front Door</span><h2>November 15, 2026</h2><p>A mixture of songs, the two faces floating around a glowing blue portal in space, opening with Mouse and the cat watching the tugboat go by...</p></div><a href="https://www.youtube.com/watch?v=umtauhrwvzc" class="action-btn">Watch this video</a></div>
+<div class="face right"><div><span class="face-tag">Right Side</span><h2>Sister</h2><p>The mind in orbit, stars wired like nerves, her hair streaming back in ribbons of light.</p></div><a href="https://mocgoogle.com/watch" class="action-btn">Watch this video</a></div>
+<div class="face back"><div><span class="face-tag">Back Wall</span><h2>Sister&#x27;s web</h2><p>The Earth at night, wrapped in her lines of light, every strand a spike on the burdock, built to catch, hold, and carry.</p></div><a href="https://mocgoogle.com/watch" class="action-btn">Watch this video</a></div>
+<div class="face left"><div><span class="face-tag">Left Side</span><h2>The man himself, first word from the new store, October 23, 2026</h2><p>It plays through TikTok&#x27;s own window, so every view lands on his own page.</p></div><a href="https://www.tiktok.com/@rick.latimer0/video/7699820565581827359" class="action-btn">Watch this video</a></div>
+<div class="face top"><div><span class="face-tag">Top Side</span><h2>The layered one, October 23, 2026</h2><p>Music stacked on top of music, layer on layer, until it stands closer to the original. It plays through YouTube&#x27;s own window, so every view...</p></div><a href="https://www.youtube.com/watch?v=35Zv9qDSu4I" class="action-btn">Watch this video</a></div>
+<div class="face bottom"><div><span class="face-tag">Bottom Side</span><h2>First guest through the doorway: Freak Flag, by Granny 4 Barrel, my fri...</h2><p>Let your freak flag fly. It plays through YouTube&#x27;s own window, so every view lands on the band&#x27;s own page.</p></div><a href="https://www.youtube.com/watch?v=4WssY1PNrtY" class="action-btn">Watch this video</a></div>
+</div></div>
+<div class="controls">
+<div class="turn-pad"><button class="turn-btn" onclick="turnHorizontal(1)">Left</button><button class="turn-btn" onclick="flipVertical('top')">Top</button><button class="turn-btn" onclick="resetFront()">Front</button><button class="turn-btn" onclick="flipVertical('bottom')">Bottom</button><button class="turn-btn" onclick="turnHorizontal(-1)">Right</button></div>
+<p class="cube-back"><a href="https://mocgoogle.com" class="action-btn">Back to Main Box</a></p>
+<div class="wheel-credit">Powered by Mouse in the spinning gerbil wheel</div>
+</div>
+</section>
+<script>const cube = document.getElementById('cube');
+    let rotY = 0;
+    let rotX = 0;
+    let isScrolling = false;
+
+    function updateCube() {
+      cube.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    }
+
+    function turnHorizontal(dir) {
+      rotX = 0;
+      rotY += dir * 90;
+      updateCube();
+    }
+
+    function flipVertical(side) {
+      rotY = 0;
+      rotX = (side === 'top') ? -90 : 90;
+      updateCube();
+    }
+
+    function resetFront() {
+      rotX = 0;
+      rotY = 0;
+      updateCube();
+    }
+
+    // Mouse wheel spinning
+    window.addEventListener('wheel', (e) => {
+      if (isScrolling) return;
+      isScrolling = true;
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        turnHorizontal(e.deltaY > 0 ? -1 : 1);
+      } else {
+        turnHorizontal(e.deltaX > 0 ? -1 : 1);
+      }
+      setTimeout(() => { isScrolling = false; }, 500);
+    });
+
+    // Touch swipe spinning for phones
+    let startX = 0;
+    let startY = 0;
+
+    window.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    });
+
+    window.addEventListener('touchend', (e) => {
+      const diffX = e.changedTouches[0].clientX - startX;
+      const diffY = e.changedTouches[0].clientY - startY;
+
+      if (Math.abs(diffX) < 35 && Math.abs(diffY) < 35) return;
+
+      if (Math.abs(diffX) > Math.abs(diffY)) {
+        turnHorizontal(diffX > 0 ? 1 : -1);
+      } else {
+        if (rotX !== 0) {
+          resetFront();
+        } else {
+          flipVertical(diffY > 0 ? 'top' : 'bottom');
+        }
+      }
+    });</script>
+
 <div class="wrap">
   <div class="roomhead">MocGooGLE.coM · free</div>
   <h1>The Flashy Wall</h1>
