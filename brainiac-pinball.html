@@ -1,0 +1,1031 @@
+<!-- COMPLETE. Assembled verbatim from Rick's parts: Part 1 (head + CSS), Part 2 (body + dictionary), Part 3 (script through stepPhysics), the tail (drawTable through closing tags), and the middle piece of stepPhysics (wall bounces, letter/bumper/flipper hits, drain). Saved 2026-11-24. -->
+<!-- MocGoogle.com Free Game & Learning Software: Brainiac Pinball Word Machine — Free to play, share, and download -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Brainiac Pinball Word Machine | MocGoogle.com Free Game Room</title>
+  <meta name="description" content="Play the Brainiac Pinball Word Machine free at MocGoogle.com. Hit letters in the 30-position bumper circle, automatically spell words, and claim the #1 spot on the leaderboard.">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: #060812;
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.14) 0%, transparent 45%);
+      color: #f8fafc;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 8px;
+      overflow-x: hidden;
+    }
+
+    .top-bar {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 6px;
+    }
+
+    .title-box h1 {
+      font-size: 1.05rem;
+      color: #38bdf8;
+      letter-spacing: 0.5px;
+    }
+
+    .title-box span {
+      font-size: 0.72rem;
+      color: #94a3b8;
+    }
+
+    .top-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .mini-btn {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .mini-btn:active {
+      background: #38bdf8;
+      color: #060812;
+    }
+
+    .hud {
+      width: 100%;
+      max-width: 440px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 2px solid #38bdf8;
+      border-radius: 12px;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+    }
+
+    .words-badge {
+      background: #0f172a;
+      border: 1px solid #facc15;
+      color: #facc15;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+
+    .tray-label {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .letter-tray {
+      display: flex;
+      gap: 5px;
+      min-height: 36px;
+      background: #090d1a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 4px 6px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tile {
+      width: 30px;
+      height: 30px;
+      background: linear-gradient(145deg, #fef08a, #eab308);
+      color: #0f172a;
+      font-weight: bold;
+      font-size: 1rem;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .tile.star-tile {
+      background: linear-gradient(145deg, #38bdf8, #0284c7);
+      color: #ffffff;
+    }
+
+    .spelled-ticker {
+      margin-top: 5px;
+      font-size: 0.76rem;
+      color: #4ade80;
+      min-height: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      justify-content: center;
+    }
+
+    canvas {
+      background: #090d1c;
+      border: 2px solid #475569;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+      display: block;
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.15);
+      touch-action: none;
+    }
+
+    .controls-row {
+      width: 100%;
+      max-width: 400px;
+      display: grid;
+      grid-template-columns: 1fr 0.85fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .ctrl-btn {
+      padding: 14px 8px;
+      border-radius: 12px;
+      border: 2px solid #38bdf8;
+      background: #1e293b;
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 0.95rem;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .ctrl-btn:active, .ctrl-btn.active {
+      background: #38bdf8;
+      color: #060812;
+    }
+
+    .launch-btn {
+      border-color: #4ade80;
+      color: #4ade80;
+    }
+
+    .launch-btn:active {
+      background: #4ade80;
+      color: #060812;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 6, 18, 0.88);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #0f172a;
+      border: 2px solid #facc15;
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(250, 204, 21, 0.25);
+    }
+
+    .modal-card h2 {
+      color: #facc15;
+      margin-bottom: 6px;
+      font-size: 1.35rem;
+    }
+
+    .modal-card p {
+      color: #cbd5e1;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+    }
+
+    .board-list {
+      list-style: none;
+      margin: 12px 0;
+      text-align: left;
+      background: #090d1c;
+      border-radius: 10px;
+      padding: 10px;
+      border: 1px solid #334155;
+    }
+
+    .board-list li {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 8px;
+      border-bottom: 1px solid #1e293b;
+      font-size: 0.92rem;
+      font-weight: bold;
+    }
+
+    .board-list li:last-child {
+      border-bottom: none;
+    }
+
+    .board-list li.rank-1 {
+      color: #facc15;
+      font-size: 1.02rem;
+    }
+
+    .name-entry {
+      margin: 12px 0;
+      display: none;
+    }
+
+    .name-entry input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 2px solid #38bdf8;
+      background: #060812;
+      color: #ffffff;
+      font-size: 1rem;
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .primary-btn {
+      background: #facc15;
+      color: #060812;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      cursor: pointer;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <div class="title-box">
+      <h1>BRAINIAC PINBALL</h1>
+      <span>Most Words Spelled = #1</span>
+    </div>
+    <div class="top-btns">
+      <button class="mini-btn" onclick="nudgeTable()">Nudge</button>
+      <button class="mini-btn" onclick="openBoard(false)">#1 Board</button>
+      <a href="index.html" class="mini-btn">Store</a>
+    </div>
+  </div>
+
+  <div class="hud">
+    <div class="stats-row">
+      <div class="words-badge">WORDS SPELLED: <span id="wordCount">0</span></div>
+      <div>BALLS: <strong id="ballsLeft" style="color:#38bdf8;">3</strong></div>
+      <div>STICKS: <strong id="stickCount" style="color:#fb7185;">0</strong></div>
+    </div>
+    <div class="tray-label">
+      <span>Letter Rack (Auto-Spells Words)</span>
+      <span id="rackCap">0 / 8</span>
+    </div>
+    <div class="letter-tray" id="letterTray">
+      <span style="color:#64748b; font-size:0.8rem;">Launch ball into the circle to collect letters!</span>
+    </div>
+    <div class="spelled-ticker" id="spelledTicker">Spelled: (none yet)</div>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="table" width="400" height="580"></canvas>
+  </div>
+
+  <div class="controls-row">
+    <button class="ctrl-btn" id="btnLeft">◀ LEFT FLIP</button>
+    <button class="ctrl-btn launch-btn" id="btnLaunch">LAUNCH</button>
+    <button class="ctrl-btn" id="btnRight">RIGHT FLIP ▶</button>
+  </div>
+
+  <div class="modal-overlay" id="boardModal">
+    <div class="modal-card">
+      <h2 id="modalTitle">TOP WORD SPELLERS</h2>
+      <p id="modalSub">Ranked strictly by most words spelled!</p>
+
+      <div class="name-entry" id="nameEntryBox">
+        <input type="text" id="playerNameInput" maxlength="12" placeholder="ENTER YOUR NAME">
+        <button class="primary-btn" onclick="savePlayerScore()">LOCK IN #1 BOARD</button>
+      </div>
+
+      <ul class="board-list" id="boardList"></ul>
+
+      <button class="primary-btn" style="background:#38bdf8; margin-top:6px;" id="playAgainBtn" onclick="closeBoard()">BACK TO TABLE</button>
+    </div>
+  </div>
+
+  <script>
+    const DICTIONARY = (
+      "ACE ACT ADD AGE AID AIM AIR ALL AND ANT ANY APE ARC ARM ART ASH ASK ATE AWE AXE " +
+      "BAD BAG BAN BAR BAT BAY BED BEE BET BIG BIN BIT BOW BOX BOY BUD BUG BUS BUY " +
+      "CAB CAN CAP CAR CAT COB COD COG COP COT COW CRY CUB CUP CUT " +
+      "DAD DAM DAY DEN DEW DIG DIM DIP DOG DOT DRY DUE DUG DYE " +
+      "EAR EAT EEL EGG ELF END ERA EVE EYE " +
+      "FAN FAR FAT FED FEE FEW FIG FIN FIT FIX FLY FOE FOG FOR FOX FRY FUN FUR " +
+      "GAP GAS GEM GET GIG GOD GOT GUM GUN GUY GYM " +
+      "HAD HAM HAS HAT HAY HEN HER HID HIM HIP HIT HOG HOP HOT HOW HUB HUG HUM HUT " +
+      "ICE ICY ILL INK INN ION IVY " +
+      "JAM JAR JAW JET JOB JOG JOY JUG " +
+      "KEY KID KIN KIT " +
+      "LAB LAP LAW LAY LED LEG LET LID LIP LIT LOG LOT LOW " +
+      "MAD MAN MAP MAT MAY MEN MET MIX MOB MOP MUD MUG " +
+      "NAP NET NEW NOD NOR NOT NOW NUT " +
+      "OAK OAR ODD OFF OIL OLD ONE ORB ORE OUR OUT OWL OWN " +
+      "PAD PAN PAT PAW PAY PEA PEN PET PIE PIG PIN PIT POD POP POT PRO PRY PUT " +
+      "RAG RAM RAN RAP RAT RAW RAY RED RIB RID RIG RIM RIP ROB ROD ROT ROW RUB RUG RUN " +
+      "SAD SAP SAT SAW SAY SEA SEE SET SEW SHE SHY SIN SIP SIT SIX SKY SLY SOB SON SOW SPY SUB SUM SUN " +
+      "TAB TAG TAN TAP TAR TEA TEN THE TIE TIN TIP TOE TOP TOY TRY TUB TUG TWO " +
+      "USE VAN VET VIA VOW WAG WAR WAS WAX WAY WEB WET WHO WHY WIG WIN WIT WON YES YET YOU ZIP ZOO " +
+      "ABLE ACID ARCH AREA ARMY ATOM AUNT AUTO BABY BACK BALL BAND BANK BASE BATH BEAR BEAT BELL BELT BEST BIKE BIRD BLUE BOAT BODY BOLD BONE BOOK BORN BOTH BOWL " +
+      "CAGE CAKE CALL CALM CAMP CARD CARE CART CASE CASH CAST CAVE CELL CHAT CHIP CITY CLAP CLAY CLUB COAL COAT CODE COLD COME COOK COOL COPY CORE CORN COST CREW CROP " +
+      "DARK DATA DATE DAWN DEAL DEEP DESK DIAL DICE DIRT DISK DIVE DOOR DOWN DRAW DROP DRUM DUCK DUST " +
+      "EACH EARN EAST EASY EDGE EVEN EVER EXIT FACE FACT FAIL FAIR FALL FARM FAST FEAR FEED FEEL FILE FILL FILM FIND FIRE FIRM FISH FIVE FLAG FLAT FLIP FLOW FOAM FOLD FOOD FOOT FORM FREE FROM FUEL FULL " +
+      "GAME GATE GEAR GIFT GIRL GIVE GLAD GLOW GOAL GOLD GOOD GRAB GRAY GROW " +
+      "HAIR HALF HALL HAND HARD HARM HEAD HEAR HEAT HELP HERO HIGH HILL HOLD HOLE HOME HOPE HORN HOUR HUGE HUNT " +
+      "IDEA INTO IRON ITEM JOIN JUMP JUST KEEP KICK KIND KING KITE KNEE KNOW " +
+      "LAKE LAMP LAND LAST LATE LEAD LEAF LEAN LEFT LIFE LIFT LIKE LINE LINK LION LIST LIVE LOCK LONG LOOK LOOP LORD LOSE LOST LOUD LOVE LUCK " +
+      "MADE MAIL MAIN MAKE MANY MARK MASK MATH MEAL MEAN MEAT MILE MILK MIND MINE MOON MORE MOST MOVE MUCH MUST " +
+      "NAME NEAR NEAT NECK NEED NEST NEWS NEXT NICE NINE NOSE NOTE " +
+      "OPEN OVER PACE PACK PAGE PAIN PAIR PARK PART PASS PAST PATH PEAK PICK PILE PINE PINK PLAN PLAY PLUS POEM POOL PORT POST PULL PUSH " +
+      "RACE RAIN RANK READ REAL REST RICE RICH RIDE RING RISE ROAD ROCK ROLL ROOM ROOT ROPE ROSE RULE RUSH " +
+      "SAFE SAIL SALT SAME SAND SAVE SEAT SEED SEEK SEEM SELF SEND SHIP SHOP SHOW SHUT SIDE SIGN SING SITE SIZE SKIN SLIP SLOW SNOW SOFT SOIL SONG SOON SORT SOUL SPIN SPOT STAR STAY STEP STOP SUCH SURE SWIM " +
+      "TAIL TAKE TALK TANK TAPE TASK TEAM TELL TENT TEST TEXT THAT THEM THEN THIN THIS TIME TIRE TONE TOOL TOWN TREE TRIP TRUE TUBE TURN TWIN TYPE " +
+      "UNIT UPON USER VERY VIEW VOTE WAIT WALK WALL WARM WASH WAVE WEAR WEEK WEST WHAT WHEN WIDE WILD WIND WINE WING WIRE WISE WISH WITH WOOD WORD WORK WRAP YARD YEAR ZERO ZONE " +
+      "APPLE BEACH BRAIN BREAD BRICK BUILD CHAIR CLOCK CLOUD DANCE DREAM DRIVE EARTH FIELD FLAME FLASH FLOAT FLOOR FORCE FRAME FRESH FRONT FRUIT GHOST GLASS GLOBE GRACE GREEN GROUP GUARD HEART HORSE HOUSE " +
+      "IMAGE LIGHT LUCKY MAGIC METAL MONEY MOUSE MUSIC NIGHT OCEAN ORBIT PAINT PAPER PEACE PHONE PILOT PLACE PLANT PLATE POINT POWER PRIZE QUICK RADIO REACH RIVER ROUND SCALE SHAPE SHARE SHINE SHORT SIGHT " +
+      "SKILL SLEEP SMART SMILE SOUND SPACE SPARK SPEAK SPEED SPELL STAGE STAND START STEAM STEEL STONE STORE STORM STORY STUDY SWEET TABLE TEACH THANK THINK THREE TIGER TOUCH TOWER TRACK TRAIN TRUTH UNDER " +
+      "VALUE VOICE WATER WHEEL WHITE WHOLE WORLD WRITE YOUNG " +
+      "CIRCLE DRAGON ENERGY GALAXY PLANET ROCKET SILVER SPIRIT SYSTEM WONDER"
+    ).split(/\s+/);
+
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function playTone(freq, type = 'sine', duration = 0.1, vol = 0.12) {
+      try {
+        if (!audioCtx) audioCtx = new AudioCtx();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playWordFanfare() {
+      playTone(523.25, 'triangle', 0.12, 0.18);
+      setTimeout(() => playTone(659.25, 'triangle', 0.12, 0.18), 90);
+      setTimeout(() => playTone(783.99, 'triangle', 0.14, 0.18), 180);
+      setTimeout(() => playTone(1046.5, 'triangle', 0.28, 0.2), 270);
+    }
+
+    const canvas = document.getElementById('table');
+    const ctx = canvas.getContext('2d');
+
+    let ballsLeft = 3;
+    let wordsSpelled = [];
+    let letterRack = [];
+    let penaltySticks = [];
+    let flashBanner = { text: '', timer: 0, color: '#4ade80' };
+    let gameOver = false;
+
+    const CX = 184;
+    const CY = 228;
+    const CR = 116;
+
+    const RING_CHARS = [
+      'A','B','C','D','E','F','G','H','I','J',
+      'K','L','M','N','O','P','Q','R','S','T',
+      'U','V','W','X','Y','Z','E','A','O','S'
+    ];
+
+    const ringNodes = [];
+    for (let i = 0; i < 30; i++) {
+      const angle = -Math.PI / 2 + (i * (Math.PI * 2 / 30));
+      const deg = ((angle * 180 / Math.PI) + 360) % 360;
+      const isTopGap = (deg > 258 && deg < 282);
+      const isBottomGap = (deg > 76 && deg < 104);
+      if (!isTopGap && !isBottomGap) {
+        ringNodes.push({
+          x: CX + Math.cos(angle) * CR,
+          y: CY + Math.sin(angle) * CR,
+          r: 10,
+          char: RING_CHARS[i],
+          isStar: (i === 0),
+          angle: angle,
+          lit: 0
+        });
+      }
+    }
+
+    const innerBumpers = [
+      { x: CX, y: CY - 44, r: 17, lit: 0, color: '#38bdf8' },
+      { x: CX - 42, y: CY - 8, r: 17, lit: 0, color: '#f472b6' },
+      { x: CX + 42, y: CY - 8, r: 17, lit: 0, color: '#f472b6' },
+      { x: CX, y: CY + 12, r: 19, lit: 0, color: '#facc15' },
+      { x: CX - 34, y: CY + 48, r: 15, lit: 0, color: '#4ade80' },
+      { x: CX + 34, y: CY + 48, r: 15, lit: 0, color: '#4ade80' }
+    ];
+
+    const outerBumpers = [
+      { x: 42, y: 175, r: 18, lit: 0 },
+      { x: 326, y: 175, r: 18, lit: 0 },
+      { x: 44, y: 315, r: 18, lit: 0 },
+      { x: 324, y: 315, r: 18, lit: 0 }
+    ];
+
+    const ball = {
+      x: 382,
+      y: 500,
+      vx: 0,
+      vy: 0,
+      r: 8.5,
+      inLane: true,
+      hitCooldown: 0
+    };
+
+    const flippers = {
+      left:  { x: 118, y: 525, len: 62, angle: 0.42, rest: 0.42, up: -0.45, pressed: false },
+      right: { x: 250, y: 525, len: 62, angle: Math.PI - 0.42, rest: Math.PI - 0.42, up: Math.PI + 0.45, pressed: false }
+    };
+
+    function resetBall() {
+      ball.x = 382;
+      ball.y = 505;
+      ball.vx = 0;
+      ball.vy = 0;
+      ball.inLane = true;
+      ball.hitCooldown = 0;
+    }
+
+    function launchBall() {
+      if (gameOver) {
+        startNewGame();
+        return;
+      }
+      if (ball.inLane) {
+        ball.vy = -15.8 - Math.random() * 1.5;
+        ball.vx = 0;
+        playTone(220, 'sawtooth', 0.18, 0.15);
+      }
+    }
+
+    function nudgeTable() {
+      if (!ball.inLane && !gameOver) {
+        ball.vx += (Math.random() - 0.5) * 5;
+        ball.vy -= 3.5;
+        playTone(140, 'square', 0.08, 0.12);
+      }
+    }
+
+    function startNewGame() {
+      ballsLeft = 3;
+      wordsSpelled = [];
+      letterRack = [];
+      penaltySticks = [];
+      gameOver = false;
+      updateHUD();
+      resetBall();
+    }
+
+    function checkAutoWords() {
+      if (letterRack.length < 3) return;
+
+      const counts = {};
+      letterRack.forEach(item => {
+        counts[item.char] = (counts[item.char] || 0) + 1;
+      });
+
+      let bestWord = '';
+      for (let w of DICTIONARY) {
+        if (w.length <= letterRack.length && w.length > bestWord.length) {
+          const needed = {};
+          let ok = true;
+          for (let ch of w) {
+            needed[ch] = (needed[ch] || 0) + 1;
+            if (needed[ch] > (counts[ch] || 0)) {
+              ok = false;
+              break;
+            }
+          }
+          if (ok) bestWord = w;
+        }
+      }
+
+      if (bestWord) {
+        for (let ch of bestWord) {
+          const idx = letterRack.findIndex(item => item.char === ch);
+          if (idx !== -1) letterRack.splice(idx, 1);
+        }
+
+        penaltySticks.splice(0, bestWord.length);
+        wordsSpelled.push(bestWord);
+        flashBanner = { text: `SPELLED: ${bestWord}! (+1 WORD)`, timer: 110, color: '#4ade80' };
+        playWordFanfare();
+        updateHUD();
+      }
+    }
+
+    function addLetterToRack(node) {
+      if (letterRack.length >= 8) {
+        letterRack.shift();
+      }
+      letterRack.push({ char: node.char, isStar: node.isStar });
+
+      if (penaltySticks.length < 16) {
+        penaltySticks.push(node.angle);
+      }
+
+      playTone(node.isStar ? 880 : 540, 'sine', 0.09, 0.14);
+      checkAutoWords();
+      updateHUD();
+    }
+
+    function clearOutsidePenalty() {
+      if (penaltySticks.length > 0) {
+        penaltySticks.pop();
+        if (letterRack.length > 0) {
+          letterRack.shift();
+        }
+        flashBanner = { text: 'OUTER BOUNCE: PENALTY CLEARED!', timer: 65, color: '#38bdf8' };
+        playTone(680, 'triangle', 0.1, 0.14);
+        updateHUD();
+      } else {
+        playTone(340, 'sine', 0.08, 0.1);
+      }
+    }
+
+    function updateHUD() {
+      document.getElementById('wordCount').textContent = wordsSpelled.length;
+      document.getElementById('ballsLeft').textContent = ballsLeft;
+      document.getElementById('stickCount').textContent = penaltySticks.length;
+      document.getElementById('rackCap').textContent = `${letterRack.length} / 8`;
+
+      const trayEl = document.getElementById('letterTray');
+      if (letterRack.length === 0) {
+        trayEl.innerHTML = '<span style="color:#64748b; font-size:0.8rem;">Hit letters on the circle to fill rack...</span>';
+      } else {
+        trayEl.innerHTML = letterRack.map(t =>
+          `<div class="tile ${t.isStar ? 'star-tile' : ''}">${t.char}</div>`
+        ).join('');
+      }
+
+      const ticker = document.getElementById('spelledTicker');
+      ticker.textContent = wordsSpelled.length
+        ? 'Spelled: ' + wordsSpelled.slice(-5).join(' • ')
+        : 'Spelled: (aim for letters to auto-spell!)';
+    }
+
+    function collideCircle(cx, cy, cr, bounceBoost = 1.05, minSpeed = 4.5) {
+      const dx = ball.x - cx;
+      const dy = ball.y - cy;
+      const dist = Math.hypot(dx, dy);
+      const minDist = ball.r + cr;
+
+      if (dist < minDist && dist > 0.001) {
+        const nx = dx / dist;
+        const ny = dy / dist;
+        ball.x = cx + nx * (minDist + 0.5);
+        ball.y = cy + ny * (minDist + 0.5);
+
+        const dot = ball.vx * nx + ball.vy * ny;
+        ball.vx = (ball.vx - 2 * dot * nx) * bounceBoost;
+        ball.vy = (ball.vy - 2 * dot * ny) * bounceBoost;
+
+        const spd = Math.hypot(ball.vx, ball.vy);
+        if (spd < minSpeed) {
+          ball.vx = nx * minSpeed;
+          ball.vy = ny * minSpeed;
+        }
+        return true;
+      }
+      return false;
+    }
+
+    function collideFlipper(f, isLeft) {
+      const x1 = f.x;
+      const y1 = f.y;
+      const x2 = x1 + Math.cos(f.angle) * f.len;
+      const y2 = y1 + Math.sin(f.angle) * f.len;
+
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const lenSq = dx * dx + dy * dy;
+      let t = ((ball.x - x1) * dx + (ball.y - y1) * dy) / lenSq;
+      t = Math.max(0, Math.min(1, t));
+
+      const closestX = x1 + t * dx;
+      const closestY = y1 + t * dy;
+      const dist = Math.hypot(ball.x - closestX, ball.y - closestY);
+
+      if (dist < ball.r + 6) {
+        const nx = (ball.x - closestX) / (dist || 1);
+        const ny = (ball.y - closestY) / (dist || 1);
+        ball.x = closestX + nx * (ball.r + 6.5);
+        ball.y = closestY + ny * (ball.r + 6.5);
+
+        if (f.pressed) {
+          ball.vy = -12.5 - t * 3.5;
+          ball.vx += (isLeft ? 1 : -1) * (2.5 + t * 3.5);
+          playTone(300, 'square', 0.07, 0.12);
+        } else {
+          const dot = ball.vx * nx + ball.vy * ny;
+          ball.vx = (ball.vx - 2 * dot * nx) * 0.85;
+          ball.vy = (ball.vy - 2 * dot * ny) * 0.85;
+        }
+      }
+    }
+
+    function stepPhysics() {
+      if (flashBanner.timer > 0) flashBanner.timer--;
+      if (ball.hitCooldown > 0) ball.hitCooldown--;
+
+      const lTarget = flippers.left.pressed ? flippers.left.up : flippers.left.rest;
+      flippers.left.angle += (lTarget - flippers.left.angle) * 0.35;
+
+      const rTarget = flippers.right.pressed ? flippers.right.up : flippers.right.rest;
+      flippers.right.angle += (rTarget - flippers.right.angle) * 0.35;
+
+      if (gameOver) return;
+
+      if (ball.inLane) {
+        if (ball.vy < 0) {
+          ball.y += ball.vy;
+          ball.vy += 0.24;
+          if (ball.y <= 52) {
+            ball.y = 52;
+            ball.inLane = false;
+            ball.vx = -6.2 - Math.random() * 2;
+            ball.vy = 2.2;
+          } else if (ball.vy >= 0) {
+            resetBall();
+          }
+        }
+        return;
+      }
+
+      ball.vy += 0.21;
+      const maxSpd = 15.5;
+      const curSpd = Math.hypot(ball.vx, ball.vy);
+      if (curSpd > maxSpd) {
+        ball.vx = (ball.vx / curSpd) * maxSpd;
+        ball.vy = (ball.vy / curSpd) * maxSpd;
+      }
+
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+
+      if (ball.x - ball.r < 12) { ball.x = 12 + ball.r; ball.vx = Math.abs(ball.vx) * 0.9; }
+      if (ball.x + ball.r > 358) { ball.x = 358 - ball.r; ball.vx = -Math.abs(ball.vx) * 0.9; }
+      if (ball.y - ball.r < 16) { ball.y = 16 + ball.r; ball.vy = Math.abs(ball.vy) * 0.9; }
+
+      if (ball.y > 430 && ball.y < 525) {
+        if (ball.x < 55) { ball.x = 55; ball.vx = Math.abs(ball.vx) * 0.8 + 1.5; }
+        if (ball.x > 313) { ball.x = 313; ball.vx = -Math.abs(ball.vx) * 0.8 - 1.5; }
+      }
+
+      for (let node of ringNodes) {
+        if (node.lit > 0) node.lit--;
+        if (collideCircle(node.x, node.y, node.r, 1.04, 4.8)) {
+          node.lit = 18;
+          if (ball.hitCooldown === 0) { ball.hitCooldown = 8; addLetterToRack(node); }
+        }
+      }
+
+      for (let b of innerBumpers) {
+        if (b.lit > 0) b.lit--;
+        if (collideCircle(b.x, b.y, b.r, 1.25, 7.2)) { b.lit = 14; playTone(420, 'triangle', 0.08, 0.14); }
+      }
+
+      for (let ob of outerBumpers) {
+        if (ob.lit > 0) ob.lit--;
+        if (collideCircle(ob.x, ob.y, ob.r, 1.22, 6.8)) { ob.lit = 16; clearOutsidePenalty(); }
+      }
+
+      collideFlipper(flippers.left, true);
+      collideFlipper(flippers.right, false);
+
+      if (ball.y > 590) {
+        ballsLeft--;
+        playTone(150, 'sawtooth', 0.35, 0.18);
+        updateHUD();
+        if (ballsLeft <= 0) { gameOver = true; openBoard(true); }
+        else { resetBall(); }
+      }
+    }
+    function drawTable() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(10, 14, 380, 554);
+
+      ctx.beginPath();
+      ctx.moveTo(366, 85);
+      ctx.lineTo(366, 568);
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(336, 85, 52, -Math.PI / 2, 0);
+      ctx.strokeStyle = '#38bdf8';
+      ctx.stroke();
+
+      penaltySticks.forEach((ang, idx) => {
+        const a = ang + idx * 0.04;
+        const x1 = CX + Math.cos(a) * (CR + 13);
+        const y1 = CY + Math.sin(a) * (CR + 13);
+        const x2 = CX + Math.cos(a) * (CR + 27);
+        const y2 = CY + Math.sin(a) * (CR + 27);
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = '#fb7185';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+      });
+
+      ctx.beginPath();
+      ctx.arc(CX, CY, CR, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.18)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      for (let node of ringNodes) {
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.r, 0, Math.PI * 2);
+        ctx.fillStyle = node.lit > 0 ? '#ffffff' : (node.isStar ? '#facc15' : '#1e293b');
+        ctx.fill();
+        ctx.strokeStyle = node.isStar ? '#fef08a' : '#38bdf8';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.fillStyle = (node.lit > 0 || node.isStar) ? '#060812' : '#f8fafc';
+        ctx.font = 'bold 11px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(node.isStar ? '★' : node.char, node.x, node.y + 0.5);
+      }
+
+      for (let b of innerBumpers) {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.fillStyle = b.lit > 0 ? '#ffffff' : b.color;
+        ctx.fill();
+        ctx.strokeStyle = '#060812';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+      }
+
+      for (let ob of outerBumpers) {
+        ctx.beginPath();
+        ctx.arc(ob.x, ob.y, ob.r, 0, Math.PI * 2);
+        ctx.fillStyle = ob.lit > 0 ? '#4ade80' : '#0f172a';
+        ctx.fill();
+        ctx.strokeStyle = '#4ade80';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        ctx.fillStyle = ob.lit > 0 ? '#060812' : '#4ade80';
+        ctx.font = 'bold 9px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('-1', ob.x, ob.y);
+      }
+
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(12, 430);
+      ctx.lineTo(112, 522);
+      ctx.moveTo(358, 430);
+      ctx.lineTo(256, 522);
+      ctx.stroke();
+
+      [flippers.left, flippers.right].forEach(f => {
+        const x2 = f.x + Math.cos(f.angle) * f.len;
+        const y2 = f.y + Math.sin(f.angle) * f.len;
+        ctx.beginPath();
+        ctx.moveTo(f.x, f.y);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 11;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+      });
+
+      ctx.fillStyle = '#4ade80';
+      ctx.fillRect(374, 520, 16, 40);
+
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+      const grad = ctx.createRadialGradient(ball.x - 3, ball.y - 3, 2, ball.x, ball.y, ball.r);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(1, '#94a3b8');
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      if (flashBanner.timer > 0) {
+        ctx.fillStyle = 'rgba(6, 8, 18, 0.85)';
+        ctx.fillRect(34, 372, 300, 34);
+        ctx.strokeStyle = flashBanner.color;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(34, 372, 300, 34);
+        ctx.fillStyle = flashBanner.color;
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(flashBanner.text, 184, 394);
+      }
+
+      if (ball.inLane && !gameOver) {
+        ctx.fillStyle = '#4ade80';
+        ctx.font = 'bold 13px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('TAP LAUNCH TO SHOOT!', 184, 405);
+      }
+    }
+
+    function loop() {
+      stepPhysics();
+      drawTable();
+      requestAnimationFrame(loop);
+    }
+
+    const btnLeft = document.getElementById('btnLeft');
+    const btnRight = document.getElementById('btnRight');
+    const btnLaunch = document.getElementById('btnLaunch');
+
+    function bindHold(el, onDown, onUp) {
+      el.addEventListener('pointerdown', (e) => { e.preventDefault(); el.classList.add('active'); onDown(); });
+      el.addEventListener('pointerup', (e) => { e.preventDefault(); el.classList.remove('active'); onUp(); });
+      el.addEventListener('pointerleave', () => { el.classList.remove('active'); onUp(); });
+    }
+
+    bindHold(btnLeft, () => flippers.left.pressed = true, () => flippers.left.pressed = false);
+    bindHold(btnRight, () => flippers.right.pressed = true, () => flippers.right.pressed = false);
+    btnLaunch.addEventListener('pointerdown', (e) => { e.preventDefault(); launchBall(); });
+
+    canvas.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      if (ball.inLane) { launchBall(); return; }
+      const rect = canvas.getBoundingClientRect();
+      const relX = e.clientX - rect.left;
+      if (relX < rect.width / 2) flippers.left.pressed = true;
+      else flippers.right.pressed = true;
+    });
+
+    canvas.addEventListener('pointerup', () => {
+      flippers.left.pressed = false;
+      flippers.right.pressed = false;
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') flippers.left.pressed = true;
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') flippers.right.pressed = true;
+      if (e.key === ' ' || e.key === 'ArrowDown') launchBall();
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') flippers.left.pressed = false;
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') flippers.right.pressed = false;
+    });
+
+    const STORAGE_KEY = 'mocgoogle_brainiac_pinball_v1';
+    const DEFAULT_BOARD = [
+      { name: 'RICK', words: 7 },
+      { name: 'MOUSE', words: 5 },
+      { name: 'SISTER', words: 4 },
+      { name: 'MERLIN', words: 3 },
+      { name: 'MUSE', words: 2 }
+    ];
+
+    function getBoard() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (Array.isArray(saved) && saved.length > 0) return saved;
+      } catch (e) {}
+      return [...DEFAULT_BOARD];
+    }
+
+    function renderBoard() {
+      const board = getBoard().sort((a, b) => b.words - a.words).slice(0, 5);
+      const listEl = document.getElementById('boardList');
+      listEl.innerHTML = board.map((entry, idx) => `
+        <li class="${idx === 0 ? 'rank-1' : ''}">
+          <span>#${idx + 1} ${entry.name}</span>
+          <span>${entry.words} ${entry.words === 1 ? 'WORD' : 'WORDS'}</span>
+        </li>
+      `).join('');
+    }
+
+    function openBoard(isEndOfGame) {
+      const modal = document.getElementById('boardModal');
+      const entryBox = document.getElementById('nameEntryBox');
+      const titleEl = document.getElementById('modalTitle');
+      const subEl = document.getElementById('modalSub');
+      const closeBtn = document.getElementById('playAgainBtn');
+
+      renderBoard();
+
+      if (isEndOfGame) {
+        const count = wordsSpelled.length;
+        const board = getBoard().sort((a, b) => b.words - a.words).slice(0, 5);
+        const qualifies = count > 0 && (board.length < 5 || count >= board[board.length - 1].words);
+
+        titleEl.textContent = `GAME OVER — ${count} ${count === 1 ? 'WORD' : 'WORDS'} SPELLED!`;
+        if (qualifies) {
+          subEl.textContent = 'You made the Top 5 Board! Enter your name below:';
+          entryBox.style.display = 'block';
+        } else {
+          subEl.textContent = 'Spell more words on your next round to claim #1!';
+          entryBox.style.display = 'none';
+        }
+        closeBtn.textContent = 'PLAY AGAIN';
+      } else {
+        titleEl.textContent = 'TOP WORD SPELLERS';
+        subEl.textContent = 'Ranked strictly by most words spelled!';
+        entryBox.style.display = 'none';
+        closeBtn.textContent = 'BACK TO TABLE';
+      }
+
+      modal.classList.add('show');
+    }
+
+    function savePlayerScore() {
+      const rawName = document.getElementById('playerNameInput').value.trim().toUpperCase();
+      const playerName = rawName || 'PLAYER';
+      const board = getBoard();
+      board.push({ name: playerName, words: wordsSpelled.length });
+      board.sort((a, b) => b.words - a.words);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(board.slice(0, 5)));
+      document.getElementById('nameEntryBox').style.display = 'none';
+      renderBoard();
+    }
+
+    function closeBoard() {
+      document.getElementById('boardModal').classList.remove('show');
+      if (gameOver) startNewGame();
+    }
+
+    updateHUD();
+    loop();
+  </script>
+</body>
+</html>
