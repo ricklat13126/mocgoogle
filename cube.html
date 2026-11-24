@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MocGoogle.com — 3D Spinning Box Prototype</title>
+  <meta name="description" content="Spin the MocGoogle cube to explore free books, science podcasts, videos, and browser tools. Free to look, free to listen, and free to carry home.">
+  <style>
+    :root {
+      --box-size: clamp(290px, 80vw, 430px);
+      --half-size: calc(var(--box-size) / 2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #070913;
+      background-image:
+        radial-gradient(circle at 20% 25%, rgba(56, 189, 248, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 80% 75%, rgba(168, 85, 247, 0.18) 0%, transparent 45%);
+      color: #f1f5f9;
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    header {
+      text-align: center;
+      z-index: 10;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+      color: #38bdf8;
+    }
+
+    header p {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    /* 3D Stage */
+    .scene {
+      width: var(--box-size);
+      height: var(--box-size);
+      perspective: 1100px;
+      margin: auto;
+    }
+
+    .cube {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .face {
+      position: absolute;
+      width: var(--box-size);
+      height: var(--box-size);
+      background: rgba(13, 18, 36, 0.96);
+      border: 2px solid #38bdf8;
+      border-radius: 18px;
+      box-shadow: inset 0 0 25px rgba(56, 189, 248, 0.2), 0 0 20px rgba(56, 189, 248, 0.15);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backface-visibility: hidden;
+    }
+
+    .face-tag {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #38bdf8;
+      font-weight: bold;
+    }
+
+    .face h2 {
+      font-size: 1.45rem;
+      color: #ffffff;
+      margin: 8px 0;
+    }
+
+    .face p {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+
+    .action-btn {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 16px;
+      background: #38bdf8;
+      color: #070913;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 10px;
+      text-align: center;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    /* 6 Cube Sides */
+    .front  { transform: rotateY(0deg) translateZ(var(--half-size)); border-color: #38bdf8; }
+    .right  { transform: rotateY(90deg) translateZ(var(--half-size)); border-color: #4ade80; }
+    .back   { transform: rotateY(180deg) translateZ(var(--half-size)); border-color: #c084fc; }
+    .left   { transform: rotateY(-90deg) translateZ(var(--half-size)); border-color: #f472b6; }
+    .top    { transform: rotateX(90deg) translateZ(var(--half-size)); border-color: #facc15; }
+    .bottom { transform: rotateX(-90deg) translateZ(var(--half-size)); border-color: #fb923c; }
+
+    .right .face-tag  { color: #4ade80; }
+    .back .face-tag   { color: #c084fc; }
+    .left .face-tag   { color: #f472b6; }
+    .top .face-tag    { color: #facc15; }
+    .bottom .face-tag { color: #fb923c; }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      z-index: 10;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    .turn-pad {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .turn-btn {
+      background: rgba(30, 41, 59, 0.9);
+      color: #f8fafc;
+      border: 1px solid #475569;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .turn-btn:active {
+      background: #38bdf8;
+      color: #070913;
+    }
+
+    .wheel-credit {
+      font-size: 0.78rem;
+      color: #64748b;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>MocGooGLE.coM</h1>
+    <p>Swipe, scroll, or tap buttons to spin the box</p>
+  </header>
+
+  <div class="scene" id="scene">
+    <div class="cube" id="cube">
+
+      <!-- FRONT -->
+      <div class="face front">
+        <div>
+          <span class="face-tag">Front Door</span>
+          <h2>True Freedom</h2>
+          <p>Welcome to MocGoogle. No paywalls, no sign-ups, and no toll. Spin the box to explore free books, science podcasts, videos, and browser tools.</p>
+        </div>
+        <button class="action-btn" onclick="turnHorizontal(-1)">Spin to Books →</button>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="face right">
+        <div>
+          <span class="face-tag">Right Side</span>
+          <h2>The Shelves &amp; Glass Board</h2>
+          <p>Read complete original books and manuscripts kept out in the open. Free to read online and free to carry home.</p>
+        </div>
+        <a href="https://mocgoogle.com" class="action-btn">Open The Shelves</a>
+      </div>
+
+      <!-- BACK -->
+      <div class="face back">
+        <div>
+          <span class="face-tag">Back Wall</span>
+          <h2>Science Podcasts</h2>
+          <p>Stream free audio episodes exploring physics, gravity, light, energy, and a second opinion on how the universe works.</p>
+        </div>
+        <a href="https://mocgoogle.com" class="action-btn">Listen Now</a>
+      </div>
+
+      <!-- LEFT -->
+      <div class="face left">
+        <div>
+          <span class="face-tag">Left Side</span>
+          <h2>The Flashy Wall</h2>
+          <p>Moving pictures, visual experiments, Sister, the man himself, and guest features hosted in our theater frame.</p>
+        </div>
+        <a href="https://mocgoogle.com" class="action-btn">Watch Videos</a>
+      </div>
+
+      <!-- TOP -->
+      <div class="face top">
+        <div>
+          <span class="face-tag">Top Side</span>
+          <h2>The Sound App</h2>
+          <p>Pick a voice tone, type or paste your words, and hear them spoken out loud right in your browser for free.</p>
+        </div>
+        <a href="https://mocgoogle.com" class="action-btn">Launch Sound App</a>
+      </div>
+
+      <!-- BOTTOM -->
+      <div class="face bottom">
+        <div>
+          <span class="face-tag">Bottom Side</span>
+          <h2>Dragons, Brainiac &amp; Contact</h2>
+          <p>Merlin makes a baby dragon, interactive wordplay cards, and direct contact with Rick Latimer in Oswego, NY.</p>
+        </div>
+        <a href="mailto:mocgoogle@mocgoogle.com" class="action-btn">Email MocGoogle</a>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="turn-pad">
+      <button class="turn-btn" onclick="turnHorizontal(1)">◀ Left</button>
+      <button class="turn-btn" onclick="flipVertical('top')">▲ Top</button>
+      <button class="turn-btn" onclick="resetFront()">Front</button>
+      <button class="turn-btn" onclick="flipVertical('bottom')">▼ Bottom</button>
+      <button class="turn-btn" onclick="turnHorizontal(-1)">Right ▶</button>
+    </div>
+    <div class="wheel-credit">Powered by Mouse in the spinning gerbil wheel</div>
+    <div style="font-size:0.78rem;color:#64748b;text-align:center;"><a href="/about.html" style="color:#38bdf8;">About</a> · <a href="/faq.html" style="color:#38bdf8;">Questions &amp; Answers</a></div>
+  </div>
+
+  <script>
+    const cube = document.getElementById('cube');
+    let rotY = 0;
+    let rotX = 0;
+    let isScrolling = false;
+
+    function updateCube() {
+      cube.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    }
+
+    function turnHorizontal(dir) {
+      rotX = 0;
+      rotY += dir * 90;
+      updateCube();
+    }
+
+    function flipVertical(side) {
+      rotY = 0;
+      rotX = (side === 'top') ? -90 : 90;
+      updateCube();
+    }
+
+    function resetFront() {
+      rotX = 0;
+      rotY = 0;
+      updateCube();
+    }
+
+    // Mouse wheel spinning
+    window.addEventListener('wheel', (e) => {
+      if (isScrolling) return;
+      isScrolling = true;
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        turnHorizontal(e.deltaY > 0 ? -1 : 1);
+      } else {
+        turnHorizontal(e.deltaX > 0 ? -1 : 1);
+      }
+      setTimeout(() => { isScrolling = false; }, 500);
+    });
+
+    // Touch swipe spinning for phones
+    let startX = 0;
+    let startY = 0;
+
+    window.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    });
+
+    window.addEventListener('touchend', (e) => {
+      const diffX = e.changedTouches[0].clientX - startX;
+      const diffY = e.changedTouches[0].clientY - startY;
+
+      if (Math.abs(diffX) < 35 && Math.abs(diffY) < 35) return;
+
+      if (Math.abs(diffX) > Math.abs(diffY)) {
+        turnHorizontal(diffX > 0 ? 1 : -1);
+      } else {
+        if (rotX !== 0) {
+          resetFront();
+        } else {
+          flipVertical(diffY > 0 ? 'top' : 'bottom');
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
