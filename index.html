@@ -41,267 +41,300 @@ body { margin:0; font-family: Georgia, 'Times New Roman', serif; background-colo
         async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
-<style>:root {
-      --box-size: clamp(290px, 80vw, 430px);
-      --half-size: calc(var(--box-size) / 2);
-    }
+<!-- 3D Depth Box: rooms, one square at a time. Replaces the Main Lobby section. Wheel and touch are scoped to the stage, so the page below still scrolls. -->
+<style>
+#depthbox {
+--ink: #f8fafc;
+      --muted: #94a3b8;
+      --panel: #1e293b;
+      --panel-line: #475569;
+      --accent: #38bdf8;
+  background: radial-gradient(circle at 50% 42%, #111b36 0%, #05070f 82%);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+  padding: 24px 16px 28px;
+}
+#depthbox, #depthbox * { box-sizing: border-box; }
 
     
 
     
 
-    
+    #depthbox header { text-align: center; z-index: 10; }
+    #depthbox header h1 { font-size: 1.4rem; letter-spacing: 0.5px; color: var(--accent); }
+    #depthbox header p { font-size: 0.85rem; color: var(--muted); margin-top: 5px; }
 
-    
-
-    
-
-    /* 3D Stage */
-    .scene {
-      width: var(--box-size);
-      height: var(--box-size);
-      perspective: 1100px;
-      margin: auto;
-    }
-
-    .cube {
-      width: 100%;
-      height: 100%;
+    /* ---------- Stage & depth cards ---------- */
+    #depthbox .stage {
       position: relative;
-      transform-style: preserve-3d;
-      transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+      width: clamp(290px, 84vw, 430px);
+      height: clamp(290px, 84vw, 430px);
+      perspective: 900px;
+      margin: auto;
+      touch-action: none; /* stage only: swipes here turn the box */
     }
 
-    .face {
+    /* faint tunnel rings behind the cards, so the deep reads as deep */
+    #depthbox .stage::before,
+    #depthbox .stage::after {
+      content: "";
       position: absolute;
-      width: var(--box-size);
-      height: var(--box-size);
-      background: rgba(13, 18, 36, 0.96);
-      border: 2px solid #38bdf8;
+      inset: 0;
+      border: 1px solid rgba(56, 189, 248, 0.10);
       border-radius: 18px;
-      box-shadow: inset 0 0 25px rgba(56, 189, 248, 0.2), 0 0 20px rgba(56, 189, 248, 0.15);
-      padding: 22px;
+      pointer-events: none;
+    }
+    #depthbox .stage::before { transform: scale(0.62); }
+    #depthbox .stage::after  { transform: scale(0.34); border-color: rgba(56, 189, 248, 0.06); }
+
+    #depthbox .card {
+      position: absolute;
+      inset: 0;
+      background: rgba(13, 18, 36, 0.97);
+      border: 2px solid var(--accent);
+      border-radius: 18px;
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.22), inset 0 0 20px rgba(56, 189, 248, 0.15);
+      padding: 26px 24px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      backface-visibility: hidden;
+      gap: 16px;
+      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease;
+      pointer-events: none;
+      will-change: transform, opacity;
     }
 
-    .face-tag {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: #38bdf8;
-      font-weight: bold;
+    #depthbox .card.front {
+      transform: translateZ(0px) scale(1);
+      opacity: 1;
+      z-index: 4;
+      pointer-events: auto;
     }
 
-    .face h2 {
-      font-size: 1.45rem;
-      color: #ffffff;
-      margin: 8px 0;
+    #depthbox .card.deep {
+      transform: translateZ(-550px) scale(0.45);
+      opacity: 0.25;
+      z-index: 3;
     }
 
-    .face p {
-      font-size: 0.95rem;
-      line-height: 1.5;
-      color: #cbd5e1;
+    #depthbox .card.deep-2 {
+      transform: translateZ(-800px) scale(0.28);
+      opacity: 0.10;
+      z-index: 2;
     }
 
-    .action-btn {
-      display: inline-block;
-      margin-top: 12px;
-      padding: 10px 16px;
-      background: #38bdf8;
-      color: #070913;
-      font-weight: bold;
-      text-decoration: none;
+    #depthbox .card.hidden-deep {
+      transform: translateZ(-1000px) scale(0.16);
+      opacity: 0;
+      z-index: 1;
+    }
+
+    #depthbox .card.passed {
+      transform: translateZ(380px) scale(1.45);
+      opacity: 0;
+      z-index: 5;
+    }
+
+    #depthbox .tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; }
+    #depthbox .card h2 { font-size: 1.5rem; line-height: 1.2; color: #fff; margin: 10px 0; }
+    #depthbox .card p { font-size: 0.95rem; line-height: 1.55; color: #cbd5e1; }
+
+    #depthbox .btn {
+      display: block;
+      padding: 13px 12px;
+      min-height: 44px;
       border-radius: 10px;
+      font-weight: bold;
+      font-size: 0.95rem;
       text-align: center;
+      text-decoration: none;
+      color: #060812;
+    }
+    #depthbox .btn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+    /* ---------- Controls ---------- */
+    #depthbox .controls-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; z-index: 10; }
+    #depthbox .controls { display: flex; gap: 12px; align-items: center; }
+    #depthbox .nav-btn {
+      background: var(--panel);
+      color: #fff;
+      border: 1px solid var(--panel-line);
+      padding: 12px 20px;
+      min-height: 48px;
+      min-width: 110px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    #depthbox .nav-btn:active { background: var(--accent); color: #060812; }
+    #depthbox .nav-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+    #depthbox .counter { font-size: 0.85rem; color: var(--muted); min-width: 56px; text-align: center; font-variant-numeric: tabular-nums; }
+
+    #depthbox .dots { display: flex; gap: 7px; }
+    #depthbox .dots button {
+      width: 36px; height: 36px;
+      padding: 0;
+      background: transparent;
       border: none;
       cursor: pointer;
-      font-size: 0.95rem;
+      display: grid;
+      place-items: center;
+    }
+    #depthbox .dots button::before {
+      content: "";
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #334155;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+    #depthbox .dots button.on::before { background: var(--accent); transform: scale(1.35); }
+    #depthbox .dots button:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; border-radius: 50%; }
+
+    @media (max-width: 380px) {
+      #depthbox .nav-btn { min-width: 96px; padding: 12px 14px; }
+      #depthbox .card { padding: 22px 20px; }
+      #depthbox .card h2 { font-size: 1.35rem; }
     }
 
-    /* 6 Cube Sides */
-    .front  { transform: rotateY(0deg) translateZ(var(--half-size)); border-color: #38bdf8; }
-    .right  { transform: rotateY(90deg) translateZ(var(--half-size)); border-color: #4ade80; }
-    .back   { transform: rotateY(180deg) translateZ(var(--half-size)); border-color: #c084fc; }
-    .left   { transform: rotateY(-90deg) translateZ(var(--half-size)); border-color: #f472b6; }
-    .top    { transform: rotateX(90deg) translateZ(var(--half-size)); border-color: #facc15; }
-    .bottom { transform: rotateX(-90deg) translateZ(var(--half-size)); border-color: #fb923c; }
-
-    .right .face-tag  { color: #4ade80; }
-    .back .face-tag   { color: #c084fc; }
-    .left .face-tag   { color: #f472b6; }
-    .top .face-tag    { color: #facc15; }
-    .bottom .face-tag { color: #fb923c; }
-
-    /* Controls */
-    .controls {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      z-index: 10;
-      width: 100%;
-      max-width: 460px;
+    @media (prefers-reduced-motion: reduce) {
+      #depthbox .card { transition-duration: 0.15s; }
     }
-
-    .turn-pad {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .turn-btn {
-      background: rgba(30, 41, 59, 0.9);
-      color: #f8fafc;
-      border: 1px solid #475569;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .turn-btn:active {
-      background: #38bdf8;
-      color: #070913;
-    }
-
-    .wheel-credit {
-      font-size: 0.78rem;
-      color: #64748b;
-      text-align: center;
-    }
-.cube-section { background:#070913; padding:2rem 1rem 1.5rem; margin:0; }
-.cube-section .cube-title { text-align:center; color:#38bdf8; font-size:1.6rem; margin:0 0 .5rem; }
-.cube-section .cube-note { text-align:center; color:#94a3b8; font-size:1rem; margin:0 0 1rem; }
-.cube-section .cube-back { text-align:center; margin-top:12px; }
 </style>
-<section class="cube-section">
-<h2 class="cube-title">The Main Lobby Cube</h2>
-<p class="cube-note">The box is the store. Turn it, tap a face, and step into a room.</p>
-<div class="scene" id="scene"><div class="cube" id="cube">
-<div class="face front">
-        <div>
-          <span class="face-tag">Front Door</span>
-          <h2>True Freedom</h2>
-          <p>Welcome to MocGoogle. No paywalls, no sign-ups, and no toll. Spin the box to explore free books, science podcasts, videos, and browser tools.</p>
-        </div>
-        <button class="action-btn" onclick="turnHorizontal(-1)">Spin to Books →</button>
-      </div>
-<div class="face right">
-        <div>
-          <span class="face-tag">Right Side</span>
-          <h2>The Shelves &amp; Glass Board</h2>
-          <p>Read complete original books and manuscripts kept out in the open. Free to read online and free to carry home.</p>
-        </div>
-        <a href="shelves.html" class="action-btn">Open The Shelves</a>
-      </div>
-<div class="face back">
-        <div>
-          <span class="face-tag">Back Wall</span>
-          <h2>Science Podcasts</h2>
-          <p>Stream free audio episodes exploring physics, gravity, light, energy, and a second opinion on how the universe works.</p>
-        </div>
-        <a href="podcasts.html" class="action-btn">Listen Now</a>
-      </div>
-<div class="face left">
-        <div>
-          <span class="face-tag">Left Side</span>
-          <h2>The Flashy Wall</h2>
-          <p>Moving pictures, visual experiments, Sister, the man himself, and guest features hosted in our theater frame.</p>
-        </div>
-        <a href="watch.html" class="action-btn">Watch Videos</a>
-      </div>
-<div class="face top">
-        <div>
-          <span class="face-tag">Top Side</span>
-          <h2>The Sound App</h2>
-          <p>Pick a voice tone, type or paste your words, and hear them spoken out loud right in your browser for free.</p>
-        </div>
-        <a href="https://muse.ai/s/sound-app-xrz6xs56mwxvxqxt/_QtIj1mEgSojZsiM89f3J1_fBw4ol0camcM9iFyliC4" class="action-btn">Launch Sound App</a>
-      </div>
-<div class="face bottom">
-        <div>
-          <span class="face-tag">Bottom Side</span>
-          <h2>Dragons, Brainiac &amp; Contact</h2>
-          <p>Merlin makes a baby dragon, interactive wordplay cards, and direct contact with Rick Latimer in Oswego, NY.</p>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;"><a href="dragons.html" class="action-btn">Meet the Dragons</a><a href="mailto:mocgoogle@mocgoogle.com" class="action-btn">Email MocGoogle</a></div>
-      </div>
-</div></div>
-<div class="controls">
-<div class="turn-pad"><button class="turn-btn" onclick="turnHorizontal(1)">Left</button><button class="turn-btn" onclick="flipVertical('top')">Top</button><button class="turn-btn" onclick="resetFront()">Front</button><button class="turn-btn" onclick="flipVertical('bottom')">Bottom</button><button class="turn-btn" onclick="turnHorizontal(-1)">Right</button></div>
-<div class="wheel-credit">Powered by Mouse in the spinning gerbil wheel</div>
-</div>
+<section id="depthbox" aria-label="MocGoogle rooms, one square at a time">
+<header>
+    <h1>MocGooGLE.coM</h1>
+    <p>Scroll or swipe to pull the next square forward</p>
+  </header>
+
+  <div class="stage" id="stage" tabindex="0" aria-label="Rooms, one square at a time, approaching from the deep"></div>
+
+  <div class="controls-wrap">
+    <div class="controls">
+      <button class="nav-btn" id="backBtn" type="button">◀ Back</button>
+      <div class="counter" id="counter" aria-live="polite">1 / 8</div>
+      <button class="nav-btn" id="fwdBtn" type="button">Forward ▶</button>
+    </div>
+    <div class="dots" id="dots" aria-label="Jump to a square"></div>
+  </div>
 </section>
-<script>const cube = document.getElementById('cube');
-    let rotY = 0;
-    let rotX = 0;
-    let isScrolling = false;
+<script>
+const FEED = [
+      { tag: "Front Door", title: "True Freedom", text: "Welcome to MocGoogle. No paywalls, no sign-ups. Scroll forward to pull each room out of the deep.", btn: "Enter Store", link: "index.html", color: "#38bdf8" },
+      { tag: "Game Room", title: "Brainiac Pinball", text: "Hit letters in the 30-position bumper circle, auto-spell words, and claim #1 on the board.", btn: "Play Pinball", link: "brainiac-pinball.html", color: "#facc15" },
+      { tag: "The Shelves", title: "Free Books", text: "Complete original books and alternative physics works kept out in the open to read free.", btn: "Open Books", link: "shelves.html", color: "#4ade80" },
+      { tag: "Audio Room", title: "Science Podcasts", text: "Stream free episodes on gravity, light, energy, and how the universe works.", btn: "Listen Now", link: "podcasts.html", color: "#c084fc" },
+      { tag: "Theater", title: "The Flashy Wall", text: "Moving pictures, visual experiments, Sister, and guest features.", btn: "Watch Videos", link: "watch.html", color: "#f472b6" },
+      { tag: "Voice Tool", title: "The Sound App", text: "Pick a voice tone, type or paste your words, and hear them spoken out loud free.", btn: "Open Sound App", link: "https://muse.ai/s/sound-app-xrz6xs56mwxvxqxt/_QtIj1mEgSojZsiM89f3J1_fBw4ol0camcM9iFyliC4", color: "#22d3ee" },
+      { tag: "Story Room", title: "Dragons", text: "Merlin makes a baby dragon, and the whole family comes after.", btn: "Meet Dragons", link: "dragons.html", color: "#fb923c" },
+      { tag: "Info & Help", title: "About & Contact", text: "Created by Rick Latimer in Oswego, NY. Reach out anytime or read the FAQ.", btn: "Email MocGoogle", link: "mailto:mocgoogle@mocgoogle.com", color: "#a3e635" }
+    ];
 
-    function updateCube() {
-      cube.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-    }
+    const stage = document.getElementById('stage');
+    const counterEl = document.getElementById('counter');
+    const dotsEl = document.getElementById('dots');
 
-    function turnHorizontal(dir) {
-      rotX = 0;
-      rotY += dir * 90;
-      updateCube();
-    }
-
-    function flipVertical(side) {
-      rotY = 0;
-      rotX = (side === 'top') ? -90 : 90;
-      updateCube();
-    }
-
-    function resetFront() {
-      rotX = 0;
-      rotY = 0;
-      updateCube();
-    }
-
-    // Mouse wheel spinning
-    window.addEventListener('wheel', (e) => {
-      if (isScrolling) return;
-      isScrolling = true;
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        turnHorizontal(e.deltaY > 0 ? -1 : 1);
-      } else {
-        turnHorizontal(e.deltaX > 0 ? -1 : 1);
-      }
-      setTimeout(() => { isScrolling = false; }, 500);
+    const cards = FEED.map(item => {
+      const div = document.createElement('div');
+      div.className = 'card hidden-deep';
+      div.style.borderColor = item.color;
+      div.setAttribute('aria-hidden', 'true');
+      div.innerHTML =
+        '<div>' +
+          '<span class="tag" style="color:' + item.color + '">' + item.tag + '</span>' +
+          '<h2>' + item.title + '</h2>' +
+          '<p>' + item.text + '</p>' +
+        '</div>' +
+        '<a class="btn" style="background:' + item.color + '" href="' + item.link + '" tabindex="-1">' + item.btn + '</a>';
+      stage.appendChild(div);
+      return div;
     });
 
-    // Touch swipe spinning for phones
-    let startX = 0;
+    const dots = FEED.map((item, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('aria-label', 'Go to square ' + (i + 1) + ': ' + item.title);
+      b.addEventListener('click', () => goTo(i));
+      dotsEl.appendChild(b);
+      return b;
+    });
+
+    let index = 0;
+    let busy = false;
+
+    function updateDepth() {
+      const total = cards.length;
+      const nextIdx = (index + 1) % total;
+      const next2Idx = (index + 2) % total;
+      const prevIdx = (index - 1 + total) % total;
+
+      cards.forEach((card, i) => {
+        let cls = 'card hidden-deep';
+        if (i === index) cls = 'card front';
+        else if (i === nextIdx) cls = 'card deep';
+        else if (i === next2Idx) cls = 'card deep-2';
+        else if (i === prevIdx) cls = 'card passed';
+        card.className = cls;
+
+        const isFront = i === index;
+        card.setAttribute('aria-hidden', isFront ? 'false' : 'true');
+        const link = card.querySelector('.btn');
+        if (link) link.tabIndex = isFront ? 0 : -1;
+      });
+
+      dots.forEach((d, i) => d.classList.toggle('on', i === index));
+      counterEl.textContent = (index + 1) + ' / ' + total;
+    }
+
+    function move(dir) {
+      const total = cards.length;
+      index = (index + dir + total) % total;
+      updateDepth();
+    }
+
+    function goTo(i) {
+      index = i;
+      updateDepth();
+    }
+
+    document.getElementById('backBtn').addEventListener('click', () => move(-1));
+    document.getElementById('fwdBtn').addEventListener('click', () => move(1));
+
+    stage.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (busy) return;
+      busy = true;
+      move(e.deltaY > 0 ? 1 : -1);
+      setTimeout(() => busy = false, 450);
+    }, { passive: false });
+
     let startY = 0;
-
-    window.addEventListener('touchstart', (e) => {
-      startX = e.touches[0].clientX;
+    let startX = 0;
+    stage.addEventListener('touchstart', e => {
       startY = e.touches[0].clientY;
+      startX = e.touches[0].clientX;
+    }, { passive: true });
+    stage.addEventListener('touchend', e => {
+      const dy = startY - e.changedTouches[0].clientY;
+      const dx = startX - e.changedTouches[0].clientX;
+      if (Math.abs(dy) > 35 && Math.abs(dy) >= Math.abs(dx)) move(dy > 0 ? 1 : -1);
+      else if (Math.abs(dx) > 35) move(dx > 0 ? 1 : -1);
+    }, { passive: true });
+
+    window.addEventListener('keydown', (e) => {
+      if (!(e.target instanceof Element) || !e.target.closest('#depthbox')) return;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); move(1); }
+      else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); move(-1); }
     });
 
-    window.addEventListener('touchend', (e) => {
-      const diffX = e.changedTouches[0].clientX - startX;
-      const diffY = e.changedTouches[0].clientY - startY;
+    updateDepth();
+</script>
 
-      if (Math.abs(diffX) < 35 && Math.abs(diffY) < 35) return;
 
-      if (Math.abs(diffX) > Math.abs(diffY)) {
-        turnHorizontal(diffX > 0 ? 1 : -1);
-      } else {
-        if (rotX !== 0) {
-          resetFront();
-        } else {
-          flipVertical(diffY > 0 ? 'top' : 'bottom');
-        }
-      }
-    });</script>
+
+
 
 <div class="wrap">
   <div class="domain">MocGooGLE.coM</div>
