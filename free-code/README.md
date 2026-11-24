@@ -16,6 +16,8 @@ Every piece of code behind this store, labeled and shelved, free to take and use
    The whole 6-sided cube, turning the box instead of scrolling the page. Front True Freedom, Right Shelves and Glass Board, Back Science Podcasts, Left Flashy Wall, Top Sound App, Bottom Dragons, Brainiac and Contact. Swipe, mouse wheel, or Turn and Flip buttons. Live on the store as cube.html (the live copy also carries a meta description and About and Questions links).
 6. **Video Theater Frame** — `video-theater-frame.css` + `video-theater-frame.js`
    The custom frame around every YouTube embed on the store. Rounded corners, subtle blue glow border, 16:9 for landscape videos, tall frame for vertical Shorts, with a Share and Copy Link bar underneath. The CSS frames the video, the JS makes the two buttons work. Live on the Flashy Wall and the Shelves since 2026-11-24.
+7. **Brainiac Pinball Word Machine** — `brainiac-pinball.html`
+   A full pinball game with a 30-position letter ring. Hit letters to fill the rack, the game auto-spells words from its dictionary, and the most words spelled takes the #1 spot on the board. Free to play, free to download. Live on the store as brainiac-pinball.html.
 
 ## Notes
 
