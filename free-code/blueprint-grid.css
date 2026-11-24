@@ -1,0 +1,15 @@
+body {
+  background-color: #090d16;
+  background-image: 
+    linear-gradient(rgba(34, 211, 238, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
+  color: #f1f5f9;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+a { color: #22d3ee; }
+h1, h2, h3 { color: #ffffff; }

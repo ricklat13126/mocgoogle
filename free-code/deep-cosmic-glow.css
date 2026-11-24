@@ -1,0 +1,15 @@
+body {
+  background-color: #070913;
+  background-image: 
+    radial-gradient(circle at 20% 25%, rgba(56, 189, 248, 0.16) 0%, transparent 45%),
+    radial-gradient(circle at 80% 75%, rgba(168, 85, 247, 0.16) 0%, transparent 45%);
+  background-attachment: fixed;
+  color: #f1f5f9;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+a { color: #38bdf8; }
+h1, h2, h3 { color: #ffffff; }

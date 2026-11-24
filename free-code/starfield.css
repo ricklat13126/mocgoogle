@@ -1,0 +1,17 @@
+body {
+  background-color: #030308;
+  background-image: 
+    radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 4px),
+    radial-gradient(#38bdf8, rgba(56,189,248,.15) 1px, transparent 3px),
+    radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+  background-size: 550px 550px, 350px 350px, 250px 250px;
+  background-position: 0 0, 40px 60px, 130px 270px;
+  color: #e2e8f0;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+a { color: #4ade80; }
+h1, h2, h3 { color: #f8fafc; }

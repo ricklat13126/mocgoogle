@@ -1,0 +1,23 @@
+/* Responsive wrap for the 3D rooms, so they hold their shape on narrow
+   phone screens and wide desktop monitors without stretching.
+   Sent by Rick 2026-11-24. Applied to the Flashy Wall 3D Room prototype;
+   saved here for the Shelves room and the cubes too. */
+
+.virtual-room {
+  width: 100%;
+  max-width: 1100px;
+  min-height: 85vh;
+  margin: 0 auto;
+  perspective: clamp(600px, 80vw, 1200px);
+  overflow: hidden;
+}
+
+.room-title {
+  font-size: clamp(1.4rem, 3vw, 2.5rem);
+}
+
+/* For mobile screens under 600px wide, a @media query flattens the
+   side-wall angles slightly so videos and book spines stay wide and
+   easy to tap with a thumb. (Rick's direction; exact angles live in
+   the Flashy Wall 3D Room prototype, which uses 78-degree side walls
+   and 48px buttons under 600px.) */
