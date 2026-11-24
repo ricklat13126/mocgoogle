@@ -18,6 +18,8 @@ Every piece of code behind this store, labeled and shelved, free to take and use
    The custom frame around every YouTube embed on the store. Rounded corners, subtle blue glow border, 16:9 for landscape videos, tall frame for vertical Shorts, with a Share and Copy Link bar underneath. The CSS frames the video, the JS makes the two buttons work. Live on the Flashy Wall and the Shelves since 2026-11-24.
 7. **Brainiac Pinball Word Machine** — `brainiac-pinball.html`
    A full pinball game with a 30-position letter ring. Hit letters to fill the rack, the game auto-spells words from its dictionary, and the most words spelled takes the #1 spot on the board. Free to play, free to download. Live on the store as brainiac-pinball.html.
+8. **3D Depth Box** — `depth-box.html`
+   The depth-approach endless square. Instead of scrolling up and down or turning a cube, each square comes out of the deep background straight toward you as you scroll or swipe forward, then glides past to reveal the next one, looping back to the start. Add as many rooms, books, or videos as you want to the FEED list.
 
 ## Notes
 
